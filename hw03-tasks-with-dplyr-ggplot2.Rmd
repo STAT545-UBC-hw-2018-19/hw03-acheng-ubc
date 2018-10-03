@@ -1,0 +1,129 @@
+---
+title: "STAT545 Assignment 2"
+author: "Alex"
+date: "October 1, 2018"
+output: github_document
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Initializing Gapminder Dataset and Libraries
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(gapminder)
+
+# these two packages help make very pretty tables
+library(knitr)
+library(kableExtra)
+```
+
+## Tasks Attempted
+| Task | Attempted |
+|---------|-------|
+| Max and Min GDP per Capita for all continents | :heavy_check_mark: |
+| Distribution of GDP per capita within continents | :heavy_check_mark: |
+| Mean Life Expectancy for different years weighted | :heavy_check_mark: |
+| Life Expectancy Trajectory over time on different continents | :heavy_check_mark: |
+| Relative Life Expectancy Exploration | :heavy_check_mark: |
+| Open-ended exploration of **interesting** country histories | :heavy_check_mark: |
+
+## Max and Min GDP per Continent
+```{r}
+gapminder %>%
+  group_by(continent,country) %>%
+  summarize(mu = mean(gdpPercap)) %>%
+  summarize(max = round(max(mu),2),
+            min = round(min(mu),2)) %>%
+  kable(col.names = c("Continent", "Max. GDP per Capita", "Min. GDP per Capita"), "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
+```
+
+We group by continent and country, and then summarize first by mean, then summarize by max and min of our previously calculated means. Piping this in kable presents us with the above table. We see that Europe contains the country with the highest GDP per capita as well as the country with the highest *minimum* GDP per capita, while Africa contains both the **lowest** max. and min. GDP per capita. This suggests that the standard of living on average is highest in Europe and lowest in Africa.
+
+The country with the lowest range in GDP per capita is Oceania, but this may be in part due to the fact that there are not as many countries in Oceania as there are in the other 4 continents.
+
+
+### Distribution of GDP per capita within continents
+```{r}
+gapminder %>%
+  ggplot(aes(gdpPercap)) +
+  geom_histogram(aes(fill = continent)) +
+  facet_wrap( ~ continent) +
+  guides(fill=FALSE) +
+  labs(x="GDP per Capita", y="Count")
+```
+
+To visualize the spread of GDP per Capita, a first guess would be to use histograms and facet by Continent. However, as we see from above it is not as illuminating as we would like; most of the graph is filled with blank space due to the skewness of the distributions (and due to facetting with the same x,y axes scales). Another idea would be to try a density plot and overlay the distributions on top of each other:
+
+```{r}
+gapminder %>%
+  ggplot(aes(gdpPercap)) +
+  geom_density(aes(fill = continent), alpha=0.5) +
+  labs(x="GDP per Capita", y="Count")
+```
+
+This makes it easier to visually compare continents with each other, but we can probably do better by adding a log scale to the x-axis.
+
+```{r}
+gapminder %>%
+  ggplot(aes(gdpPercap)) +
+  geom_density(aes(fill = continent), alpha=0.5) +
+  labs(x="GDP per Capita", y="Count") +
+  scale_x_log10()
+```
+
+Much better! (Although keep in mind log scales make it harder to make good quantitative judgements.) From this graph we can quickly see that Asia contains the greatest variance in GDP per capita, followed by Africa. Between Africa and Asia, Africa has a considerably higher peak towards the low end of the GDP per capita distribution, reflecting what we found earlier that Africa contains both the lowest max. and min. GDP per capita across all continents.
+
+
+
+### Quantitative Variable
+Let's look at some details about the `lifeExp` variable. This variable tells us the life expectancy of a certain population of a country for a specific year.
+
+```{r}
+summary(gapminder$lifeExp)
+```
+
+A quick summary tells us the mean lifeExp over all countries is 59.47 years, and that the lifeExp variable ranges between 23.6 and 82.6 years. Below is the distribution of lifeExp in different continents:
+
+```{r, message=FALSE, warnings=FALSE}
+gapminder %>%
+  ggplot(aes(lifeExp)) +
+  geom_histogram(aes(fill = continent)) +
+  facet_wrap( ~ continent) + # allows us to make a separate histogram for each continent
+  guides(fill=FALSE) # remove the legend as it is largely redundant after facetting
+```
+
+Let's calculate at the mean and standard deviation lifeExp of each continent. The function `aggregate()` allows us to apply a function to each column of a sub dataframe that we specify:
+```{r}
+a <- aggregate(gapminder$lifeExp ~ gapminder$continent, FUN=mean) # this is to save our output into a matrix so that we can make it into a nice table
+b <- aggregate(gapminder$lifeExp ~ gapminder$continent, FUN=sd)
+a[3] <- b[2]
+a %>%
+  kable(col.names = c("Continent", "Mean Life Exp (Yrs)", "SD Life Exp (Yrs)"),"html") %>% #col.names inside kable() alows us to rename our columns
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F)
+```
+
+From this we see that Oceania has the highest life expectancy on average, while Africa has the lowest life expectancy on average.
+
+
+### Practice using filter(), select(), and %>%
+Let's look at how Canada compares to the top 10 countries in terms of GDP per capita in 2007!
+
+First we filter out just data from 2008, then we will select only country, lifeExp, pop, and gdpPercap (omitting year and continent as that is not very interesting now to compare). Then we can use arrange() to sort by descending GDP per capita, and use slice() to take out the top 10 countries by GDP per capita:
+```{r, warning=FALSE}
+gapminder %>%
+  filter(year == 2007) %>%
+  select(country, lifeExp, pop, gdpPercap) %>%
+  arrange(desc(gdpPercap)) %>%
+  slice(1:10) %>% #slice(1:10) returns everything from row 1 to row 10
+  kable(col.names = c("Country", "Life Exp (Yrs)", "Population (Persons)", "GDP Per Cap. ($)"), "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F)
+
+```
+
+From this we see that Canada ranked 9th in GDP per Capita in 2007. Out of these top 10 countries, Canada ranks 4th in life expectancy at a mean 80.653 years. The majority of countries on this top 10 list have populations below 10 million, with exceptions being the United States at 301.1 million, Canada at 33.4 million, and Netherlands at 16.6 million.
+
