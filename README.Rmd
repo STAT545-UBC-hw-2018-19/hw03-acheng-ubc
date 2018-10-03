@@ -1,0 +1,13 @@
+# STAT545
+
+## Assignment 3 Repository
+
+This assignment uses dplyr and ggplot2 to answer some well-defined statistical questions (and one not-so-well defined question).
+
+### What's interesting here?
+| File | Description |
+|------|-------------|
+| README.Rmd | Quick description of the repository |
+| hw03-tasks-with-dplyr-ggplot2.Rmd | Assignment 3 R Markdown file |
+| hw03-tasks-with-dplyr-ggplot2.md | Assignment3 Github Document |
+| hw03-tasks-with-dplyr-ggplot2_files | Folder containing graphics created by Markdown file |
