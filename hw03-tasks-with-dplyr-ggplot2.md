@@ -192,7 +192,7 @@ Much better! (Although keep in mind log scales make it harder to make good quant
 Trimmed Mean Life Expectancy in the Americas
 --------------------------------------------
 
-A trimmed mean removes a portion of the largest and smallest elements in a set before computing the mean. This can be useful in situations where our data is skewed or non-normal in some way, allowing us to increase robustness while sacrificing efficiency for less heavily-tailed distributions such as the normal distribution [(ref: https://en.wikipedia.org/wiki/Truncated\_mean)](https://en.wikipedia.org/wiki/Truncated_mean) In R, we can achieve this by specifying the `trim` option in `mean()`.
+A trimmed mean removes a portion of the largest and smallest elements in a set before computing the mean. This can be useful in situations where our data is skewed or non-normal in some way, allowing us to increase robustness while sacrificing efficiency for less heavily-tailed distributions such as the normal distribution [(Source: https://en.wikipedia.org/wiki/Truncated\_mean)](https://en.wikipedia.org/wiki/Truncated_mean) In R, we can achieve this by specifying the `trim` option in `mean()`.
 
 Let's look at the trimmed mean life expectancy in the Americas for different years. We will trim by 25% on both ends (this is known as the interquartile mean (IQM)):
 
@@ -456,3 +456,331 @@ gapminder %>%
 ![](hw03-tasks-with-dplyr-ggplot2_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 From the figure we see that for all continents, the number of countries with low life expectancy goes down for each 5 year period. Europe in particular no longer has countries with low life expectancy by our definition by the year 1987. What is striking however is the huge number of countries with low life expectancy in Africa relative to the other continents. In addition, the number of countries with low life expectancy does not decrease with time as much as the other continents.
+
+Finding a Country with an Interesting History
+---------------------------------------------
+
+Let's look at the previous 5 tasks to see if there are any trends that stand out as something interesting. What jumps out to me is the dip in mean life expectancy between 1997 and 2002 in Africa. Let's *zoom in* and look at the life expectancies of all countries in Africa:
+
+``` r
+gapminder %>%
+  filter(continent == "Africa") %>%
+  ggplot(aes(year,lifeExp)) +
+  geom_line(aes(group=country,
+                colour = country),
+            size = 1,
+            show.legend = FALSE) +
+  scale_color_manual(values = country_colors)
+```
+
+![](hw03-tasks-with-dplyr-ggplot2_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+From this busy-looking graph, we do notice one line in particular with a very sharp drop in life expectancy between 1987 and 1992. Let's look closer at 1987 and 1992 in Africa
+
+``` r
+gapminder %>%
+  filter(continent == "Africa", year %in% c(1987:1992)) %>%
+  group_by(country) %>%
+  mutate(lifeExpdrop = lifeExp[year == 1992] - lifeExp[year == 1987]) %>%
+  filter(lifeExpdrop < 0, year == 1992) %>%
+  arrange(lifeExpdrop) %>%
+  select(country, year, lifeExp, pop, lifeExpdrop) %>%
+  kable(col.names = c("Country", "Year", "Life Expectancy", "Life Expectancy Drop", "Population"), "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
+```
+
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:right;">
+Year
+</th>
+<th style="text-align:right;">
+Life Expectancy
+</th>
+<th style="text-align:right;">
+Life Expectancy Drop
+</th>
+<th style="text-align:right;">
+Population
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rwanda
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+23.599
+</td>
+<td style="text-align:right;">
+7290203
+</td>
+<td style="text-align:right;">
+-20.421
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+40.802
+</td>
+<td style="text-align:right;">
+1912974
+</td>
+<td style="text-align:right;">
+-5.225
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Somalia
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+39.658
+</td>
+<td style="text-align:right;">
+6099799
+</td>
+<td style="text-align:right;">
+-4.843
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Zambia
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+46.100
+</td>
+<td style="text-align:right;">
+8381163
+</td>
+<td style="text-align:right;">
+-4.721
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burundi
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+44.736
+</td>
+<td style="text-align:right;">
+5809236
+</td>
+<td style="text-align:right;">
+-3.475
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+48.825
+</td>
+<td style="text-align:right;">
+18252190
+</td>
+<td style="text-align:right;">
+-2.684
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cote d'Ivoire
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+52.044
+</td>
+<td style="text-align:right;">
+12772596
+</td>
+<td style="text-align:right;">
+-2.611
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Zimbabwe
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+60.377
+</td>
+<td style="text-align:right;">
+10704340
+</td>
+<td style="text-align:right;">
+-1.974
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Congo, Dem. Rep.
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+45.548
+</td>
+<td style="text-align:right;">
+41672143
+</td>
+<td style="text-align:right;">
+-1.864
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+38.333
+</td>
+<td style="text-align:right;">
+4260884
+</td>
+<td style="text-align:right;">
+-1.673
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tanzania
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+50.440
+</td>
+<td style="text-align:right;">
+26605473
+</td>
+<td style="text-align:right;">
+-1.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+49.396
+</td>
+<td style="text-align:right;">
+3265124
+</td>
+<td style="text-align:right;">
+-1.089
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Congo, Rep.
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+56.433
+</td>
+<td style="text-align:right;">
+2409073
+</td>
+<td style="text-align:right;">
+-1.037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Botswana
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+62.745
+</td>
+<td style="text-align:right;">
+1342614
+</td>
+<td style="text-align:right;">
+-0.877
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+54.314
+</td>
+<td style="text-align:right;">
+12467171
+</td>
+<td style="text-align:right;">
+-0.671
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+1992
+</td>
+<td style="text-align:right;">
+59.285
+</td>
+<td style="text-align:right;">
+25020539
+</td>
+<td style="text-align:right;">
+-0.054
+</td>
+</tr>
+</tbody>
+</table>

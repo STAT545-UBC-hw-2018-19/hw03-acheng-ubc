@@ -83,7 +83,7 @@ Much better! (Although keep in mind log scales make it harder to make good quant
 
 
 ## Trimmed Mean Life Expectancy in the Americas
-A trimmed mean removes a portion of the largest and smallest elements in a set before computing the mean. This can be useful in situations where our data is skewed or non-normal in some way, allowing us to increase robustness while sacrificing efficiency for less heavily-tailed distributions such as the normal distribution [(ref: https://en.wikipedia.org/wiki/Truncated_mean)](https://en.wikipedia.org/wiki/Truncated_mean)
+A trimmed mean removes a portion of the largest and smallest elements in a set before computing the mean. This can be useful in situations where our data is skewed or non-normal in some way, allowing us to increase robustness while sacrificing efficiency for less heavily-tailed distributions such as the normal distribution [(Source: https://en.wikipedia.org/wiki/Truncated_mean)](https://en.wikipedia.org/wiki/Truncated_mean)
 In R, we can achieve this by specifying the `trim` option in `mean()`.
 
 Let's look at the trimmed mean life expectancy in the Americas for different years. We will trim by 25% on both ends (this is known as the interquartile mean (IQM)):
@@ -165,3 +165,32 @@ gapminder %>%
 ```
 
 From the figure we see that for all continents, the number of countries with low life expectancy goes down for each 5 year period. Europe in particular no longer has countries with low life expectancy by our definition by the year 1987. What is striking however is the huge number of countries with low life expectancy in Africa relative to the other continents. In addition, the number of countries with low life expectancy does not decrease with time as much as the other continents.
+
+## Finding a Country with an Interesting History
+Let's look at the previous 5 tasks to see if there are any trends that stand out as something interesting. What jumps out to me is the dip in mean life expectancy between 1997 and 2002 in Africa. Let's *zoom in* and look at the life expectancies of all countries in Africa:
+
+```{r}
+gapminder %>%
+  filter(continent == "Africa") %>%
+  ggplot(aes(year,lifeExp)) +
+  geom_line(aes(group=country,
+                colour = country),
+            size = 1,
+            show.legend = FALSE) +
+  scale_color_manual(values = country_colors)
+```
+
+From this busy-looking graph, we do notice one line in particular with a very sharp drop in life expectancy between 1987 and 1992. Let's look closer at 1987 and 1992 in Africa
+```{r}
+gapminder %>%
+  filter(continent == "Africa", year %in% c(1987:1992)) %>%
+  group_by(country) %>%
+  mutate(lifeExpdrop = lifeExp[year == 1992] - lifeExp[year == 1987]) %>%
+  filter(lifeExpdrop < 0, year == 1992) %>%
+  arrange(lifeExpdrop) %>%
+  select(country, year, lifeExp, pop, lifeExpdrop) %>%
+  kable(col.names = c("Country", "Year", "Life Expectancy", "Life Expectancy Drop", "Population"), "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
+```
+
+
