@@ -1,4 +1,4 @@
-STAT545 Assignment 2
+STAT545 Assignment 3
 ================
 Alex
 October 1, 2018
@@ -475,17 +475,17 @@ gapminder %>%
 
 ![](hw03-tasks-with-dplyr-ggplot2_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
-From this busy-looking graph, we do notice one line in particular with a very sharp drop in life expectancy between 1987 and 1992. Let's look closer at 1987 and 1992 in Africa
+From this busy-looking graph, we do notice one line in particular with a very sharp drop in life expectancy between 1987 and 1992. Let's look closer at 1987 and 1992 in Africa:
 
 ``` r
 gapminder %>%
   filter(continent == "Africa", year %in% c(1987:1992)) %>%
   group_by(country) %>%
   mutate(lifeExpdrop = lifeExp[year == 1992] - lifeExp[year == 1987]) %>%
-  filter(lifeExpdrop < 0, year == 1992) %>%
+  filter(lifeExpdrop < 0) %>%
   arrange(lifeExpdrop) %>%
   select(country, year, lifeExp, pop, lifeExpdrop) %>%
-  kable(col.names = c("Country", "Year", "Life Expectancy", "Life Expectancy Drop", "Population"), "html") %>%
+  kable(col.names = c("Country", "Year", "Life Expectancy", "Population", "Life Expectancy Drop"), "html") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
 ```
 
@@ -502,14 +502,31 @@ Year
 Life Expectancy
 </th>
 <th style="text-align:right;">
-Life Expectancy Drop
+Population
 </th>
 <th style="text-align:right;">
-Population
+Life Expectancy Drop
 </th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rwanda
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+44.020
+</td>
+<td style="text-align:right;">
+6349365
+</td>
+<td style="text-align:right;">
+-20.421
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rwanda
@@ -525,6 +542,23 @@ Rwanda
 </td>
 <td style="text-align:right;">
 -20.421
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Liberia
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+46.027
+</td>
+<td style="text-align:right;">
+2269414
+</td>
+<td style="text-align:right;">
+-5.225
 </td>
 </tr>
 <tr>
@@ -549,6 +583,23 @@ Liberia
 Somalia
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+44.501
+</td>
+<td style="text-align:right;">
+6921858
+</td>
+<td style="text-align:right;">
+-4.843
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Somalia
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -559,6 +610,23 @@ Somalia
 </td>
 <td style="text-align:right;">
 -4.843
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Zambia
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+50.821
+</td>
+<td style="text-align:right;">
+7272406
+</td>
+<td style="text-align:right;">
+-4.721
 </td>
 </tr>
 <tr>
@@ -583,6 +651,23 @@ Zambia
 Burundi
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+48.211
+</td>
+<td style="text-align:right;">
+5126023
+</td>
+<td style="text-align:right;">
+-3.475
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Burundi
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -593,6 +678,23 @@ Burundi
 </td>
 <td style="text-align:right;">
 -3.475
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Uganda
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+51.509
+</td>
+<td style="text-align:right;">
+15283050
+</td>
+<td style="text-align:right;">
+-2.684
 </td>
 </tr>
 <tr>
@@ -617,6 +719,23 @@ Uganda
 Cote d'Ivoire
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+54.655
+</td>
+<td style="text-align:right;">
+10761098
+</td>
+<td style="text-align:right;">
+-2.611
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cote d'Ivoire
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -627,6 +746,23 @@ Cote d'Ivoire
 </td>
 <td style="text-align:right;">
 -2.611
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Zimbabwe
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+62.351
+</td>
+<td style="text-align:right;">
+9216418
+</td>
+<td style="text-align:right;">
+-1.974
 </td>
 </tr>
 <tr>
@@ -651,6 +787,23 @@ Zimbabwe
 Congo, Dem. Rep.
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+47.412
+</td>
+<td style="text-align:right;">
+35481645
+</td>
+<td style="text-align:right;">
+-1.864
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Congo, Dem. Rep.
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -661,6 +814,23 @@ Congo, Dem. Rep.
 </td>
 <td style="text-align:right;">
 -1.864
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sierra Leone
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+40.006
+</td>
+<td style="text-align:right;">
+3868905
+</td>
+<td style="text-align:right;">
+-1.673
 </td>
 </tr>
 <tr>
@@ -685,6 +855,23 @@ Sierra Leone
 Tanzania
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+51.535
+</td>
+<td style="text-align:right;">
+23040630
+</td>
+<td style="text-align:right;">
+-1.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Tanzania
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -695,6 +882,23 @@ Tanzania
 </td>
 <td style="text-align:right;">
 -1.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+50.485
+</td>
+<td style="text-align:right;">
+2840009
+</td>
+<td style="text-align:right;">
+-1.089
 </td>
 </tr>
 <tr>
@@ -719,6 +923,23 @@ Central African Republic
 Congo, Rep.
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+57.470
+</td>
+<td style="text-align:right;">
+2064095
+</td>
+<td style="text-align:right;">
+-1.037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Congo, Rep.
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -729,6 +950,23 @@ Congo, Rep.
 </td>
 <td style="text-align:right;">
 -1.037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Botswana
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+63.622
+</td>
+<td style="text-align:right;">
+1151184
+</td>
+<td style="text-align:right;">
+-0.877
 </td>
 </tr>
 <tr>
@@ -753,6 +991,23 @@ Botswana
 Cameroon
 </td>
 <td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+54.985
+</td>
+<td style="text-align:right;">
+10780667
+</td>
+<td style="text-align:right;">
+-0.671
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cameroon
+</td>
+<td style="text-align:right;">
 1992
 </td>
 <td style="text-align:right;">
@@ -763,6 +1018,23 @@ Cameroon
 </td>
 <td style="text-align:right;">
 -0.671
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Kenya
+</td>
+<td style="text-align:right;">
+1987
+</td>
+<td style="text-align:right;">
+59.339
+</td>
+<td style="text-align:right;">
+21198082
+</td>
+<td style="text-align:right;">
+-0.054
 </td>
 </tr>
 <tr>
@@ -784,3 +1056,6 @@ Kenya
 </tr>
 </tbody>
 </table>
+We filter out only the years 1987 and 1992 in Africa, calculate the drop in life expectancy over this time period, then sort by greatest drop in life expectancy and present just the countries whose life expectancies dropped during this period. From this it is clear: the country that experienced the drastic drop in life expectancy was Rwanda. A quick google search (for anyone who is unaware of the history of Rwanda during this era) reveals that the Rwandan Civil War between the Hutu, Tutsi, and Twa people occurred in 1990, within the time period we filtered out. In particular, the **Rwandan Genocide** occurred between April 7 and July 15 1994, where somewhere between 500,000 to 2,000,000 Tutsi people were murdered ((Source: <https://en.wikipedia.org/wiki/Rwandan_genocide>))\[<https://en.wikipedia.org/wiki/Rwandan_genocide>\]. Since we left in Population in our table, we also see that the population decreased by 940838, which is within the bounds of the death toll reported on Wikipedia.
+
+While horrific, this particular exercise hits home the power of dplyr and ggplot (and R in general) to explore data, as it is quite mind-blowing to me that I was able to see the evidence of a major historical event just by playing around with the data.
