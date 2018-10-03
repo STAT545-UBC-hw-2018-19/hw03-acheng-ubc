@@ -349,3 +349,110 @@ gapminder %>%
 ![](hw03-tasks-with-dplyr-ggplot2_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 From this we see that all continents have a trend of increasing life expectancy over time. However, in Africa there was a period of decrease in life expectancy from 1997 to 2002. This suggests that there was some period of turmoil between 1997 and 2002 either in some countries in Africa. An interesting thing to note is that the life expectancy trajectories of each continent **never** cross one another; if one continent had a higher life expectancy than another in 1952, they will also have a higher life expectancy in any other year.
+
+Relative Life Expectancy Exploration
+------------------------------------
+
+Let us consider the relative life expectancies between continents. First we must decide on some definition of *low life expectancy*. Although it may make more statistical sense to choose a quantity such as mean or median life expectancy within all continents, I feel that a more poignant and relevant choice would be the current **average age of graduate students in Canada**. The average age of graduate students in Canada at the time of Master's degree graduation was **32 years** ((Source: statista.com, 2000-2010))\[<https://www.statista.com/statistics/451808/average-masters-degree-graduation-age-in-canada/>\]. I will define low life expectancy as lower than or equal to 64, as that means that at the average age of Master's graduate in Canada, you will have **half** of your life in those countries.
+
+Here is the proportion of countries in each continent with a low life expectancy (&lt;= 64 years) in 1952:
+
+``` r
+a <- gapminder %>%
+  filter(year == "1952") %>%
+  group_by(continent,country) %>%
+  summarize(mu = mean(lifeExp)) %>%
+  mutate(num_countries = n()) %>%
+  filter(mu <= 64) %>%
+  mutate(prop = n() / num_countries * 100) %>% # Calculate the proportion of total countries that have low life Exp per continent
+  summarize(numlowlifeExp = n(),
+            prop = mean(prop)) # prop = mean(prop) is a very spaghetti code way to add a column with the proportion of low lifeExp countries. There is likely a better way to do this
+
+a %>%
+  kable(col.names = c("Continent", "Number of Low Life Expectancy Countries", "Percent of Total Countries with Low Life Expectancy"), "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
+```
+
+<table class="table table-striped table-hover table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Continent
+</th>
+<th style="text-align:right;">
+Number of Low Life Expectancy Countries
+</th>
+<th style="text-align:right;">
+Percent of Total Countries with Low Life Expectancy
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Africa
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+100.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Americas
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+84.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Asia
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+96.96970
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Europe
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+33.33333
+</td>
+</tr>
+</tbody>
+</table>
+Over 80% of countries in Africa, America, and Asia have low life expectancy in 1952. This should not be surprising, as we know that life expectancy is markedly lower in the 50s. What may be surprising is that Europe and Oceania have less than 35% of countries with low life expectancy in 1952. In particular, Oceania does not even appear in the above graph as they contained zero countries with low life expectancy and was thus filtered out by `filter(mu <= 64)`. (For the future, should probably look for a way to include it into the graph without excess spaghetti coding.) This suggests that in the 50s, Europe and Oceania had a higher standard of living compared to other continents in this time period.
+
+We should also look at how this evolves over time; however, a table would not be the best way to present this as it would be much too long. Instead, we could again use a line plot:
+
+``` r
+gapminder %>%
+  group_by(year,continent,country) %>%
+  summarize(mu = mean(lifeExp)) %>%
+  mutate(num_countries = n()) %>%
+  filter(mu <= 64) %>%
+  mutate(prop = n() / num_countries * 100) %>% # Calculate the proportion of total countries that have low life Exp per continent
+  summarize(numlowlifeExp = n(),
+            prop = mean(prop)) %>%
+  ggplot(aes(year,numlowlifeExp)) +
+  geom_point(colour = "Black") +
+  geom_line(aes(group=continent, colour=continent)) +
+  labs(title="Number of Countries with Low Life Expectancy (<=64 years) over Time", x="Year", y="Number of Countries")
+```
+
+![](hw03-tasks-with-dplyr-ggplot2_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+From the figure we see that for all continents, the number of countries with low life expectancy goes down for each 5 year period. Europe in particular no longer has countries with low life expectancy by our definition by the year 1987. What is striking however is the huge number of countries with low life expectancy in Africa relative to the other continents. In addition, the number of countries with low life expectancy does not decrease with time as much as the other continents.
