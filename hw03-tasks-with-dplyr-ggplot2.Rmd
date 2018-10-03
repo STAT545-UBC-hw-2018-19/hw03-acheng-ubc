@@ -3,6 +3,7 @@ title: "STAT545 Assignment 3"
 author: "Alex"
 date: "October 1, 2018"
 output: github_document
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -192,7 +193,7 @@ gapminder %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", full_width = F))
 ```
 
-We filter out only the years 1987 and 1992 in Africa, calculate the drop in life expectancy over this time period, then sort by greatest drop in life expectancy and present just the countries whose life expectancies dropped during this period. From this it is clear: the country that experienced the drastic drop in life expectancy was Rwanda. A quick google search (for anyone who is unaware of the history of Rwanda during this era) reveals that the Rwandan Civil War between the Hutu, Tutsi, and Twa people occurred in 1990, within the time period we filtered out. In particular, the **Rwandan Genocide** occurred between April 7 and July 15 1994, where somewhere between 500,000 to 2,000,000 Tutsi people were murdered [(Source: https://en.wikipedia.org/wiki/Rwandan_genocide)](https://en.wikipedia.org/wiki/Rwandan_genocide). Since we left in Population in our table, we also see that the population decreased by 940838, which is within the bounds of the death toll reported on Wikipedia.
+We filter out only the years 1987 and 1992 in Africa, calculate the drop in life expectancy over this time period, then sort by greatest drop in life expectancy and present just the countries whose life expectancies dropped during this period. From this it is clear: the country that experienced the drastic drop in life expectancy was Rwanda. A quick google search (for anyone who is unaware of the history of Rwanda during this era) reveals that the Rwandan Civil War between the Hutu, Tutsi, and Twa people occurred in 1990, within the time period we filtered out. In particular, the **Rwandan Genocide** occurred between April 7 and July 15 1994, where somewhere between 500,000 to 2,000,000 Tutsi people were murdered [(Source: https://en.wikipedia.org/wiki/Rwandan_genocide) ](https://en.wikipedia.org/wiki/Rwandan_genocide). Since we left in Population in our table, we also see that the population decreased by 940838, which is within the bounds of the death toll reported on Wikipedia.
 
 
 While horrific, this particular exercise hits home the power of dplyr and ggplot (and R in general) to explore data, as it is quite mind-blowing to me that I was able to see the evidence of a major historical event just by playing around with the data.
