@@ -111,6 +111,19 @@ table %>%
 This leads quite well to the next task, where we will look at change in life expectancy over time in all continents!
 
 ## Life Expectancy Change Over Time in Each Continent
+We can use what we learned from the previous task and apply it to each continent to look at life expectancy change over time for each continent. A first thought is that it would be interesting to plot them all on the same graph. For consistency we will continue using the interquartile mean.
 
+```{r}
+gapminder %>%
+#  filter(continent == "Americas") %>% # comment out the filter() to apply to all continents. Easy!
+  group_by(continent, year) %>%
+  summarize(intqrt_mean = round(mean(lifeExp, trim=0.25),2)) %>%
+  ggplot(aes(year,intqrt_mean)) +
+  geom_point(colour = "Black") +
+  geom_line(aes(group=continent, colour = continent)) +
+  labs(title="Trajectory of Life Expectancy over a 55 year period by Continent", x="Year", y="Interquartile Mean Life Expectancy (Years)")
+```
+
+From this we see that all continents have a trend of increasing life expectancy over time. However, in Africa there was a period of decrease in life expectancy from 1997 to 2002. This suggests that there was some period of turmoil between 1997 and 2002 either in some countries in Africa. An interesting thing to note is that the life expectancy trajectories of each continent **never** cross one another; if one continent had a higher life expectancy than another in 1952, they will also have a higher life expectancy in any other year.
 
 
