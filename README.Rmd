@@ -4,6 +4,10 @@
 
 This assignment uses dplyr and ggplot2 to answer some well-defined statistical questions (and one not-so-well defined question).
 
+
+**To marking TA**: Sorry! I only saw your comment recently on my HW02 about how to include a table of contents, so I didn't include it in this assignment. I will make sure to add it in my next assignment!
+
+
 ### What's interesting here?
 | File | Description |
 |------|-------------|
